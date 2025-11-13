@@ -5,15 +5,15 @@
 
 ###  Features หลัก
 
-* ✅ ระบบ **Login/Register** (ใช้ Username/Password)
-* [cite_start]✅ แสดงชื่อผู้ใช้ปัจจุบันที่ล็อกอินอยู่ [cite: 37]
-* [cite_start]✅ รายการการสนทนา (แสดงชื่อคู่สนทนา, ข้อความล่าสุด, เวลา) [cite: 31]
-* [cite_start]✅ การเรียงลำดับการสนทนาตามข้อความล่าสุด [cite: 19, 31]
-* [cite_start]✅ การเริ่มการสนทนาใหม่ (ป้องกันการสนทนาซ้ำซ้อน) [cite: 20, 32]
-* [cite_start]✅ ห้องแชท (แสดงข้อความ, ผู้ส่ง, เวลา) [cite: 34]
-* [cite_start]✅ การส่งข้อความใหม่ [cite: 35]
-* [cite_start]✅ การจัดการสถานะ Loading และ Error [cite: 38]
-* [cite_start]✅ การอนุญาต (Authorization) ที่เหมาะสม: ผู้ใช้เห็นและส่งข้อความได้เฉพาะในการสนทนาของตนเองเท่านั้น [cite: 28]
+*  ระบบ **Login/Register** (ใช้ Username/Password)
+* [cite_start] แสดงชื่อผู้ใช้ปัจจุบันที่ล็อกอินอยู่ [cite: 37]
+* [cite_start] รายการการสนทนา (แสดงชื่อคู่สนทนา, ข้อความล่าสุด, เวลา) [cite: 31]
+* [cite_start] การเรียงลำดับการสนทนาตามข้อความล่าสุด [cite: 19, 31]
+* [cite_start] การเริ่มการสนทนาใหม่ (ป้องกันการสนทนาซ้ำซ้อน) [cite: 20, 32]
+* [cite_start] ห้องแชท (แสดงข้อความ, ผู้ส่ง, เวลา) [cite: 34]
+* [cite_start] การส่งข้อความใหม่ [cite: 35]
+* [cite_start] การจัดการสถานะ Loading และ Error [cite: 38]
+* [cite_start] การอนุญาต (Authorization) ที่เหมาะสม: ผู้ใช้เห็นและส่งข้อความได้เฉพาะในการสนทนาของตนเองเท่านั้น [cite: 28]
 
 ---
 
@@ -89,11 +89,3 @@
 * [cite_start]**Validation:** มีการตรวจสอบ Request Payload (เช่น `content` ไม่ว่าง, `otherUserId` มีอยู่จริง) และใช้ HTTP Status Code ที่เหมาะสม (เช่น 400, 401, 404, 201)[cite: 24, 25, 71].
 * [cite_start]**Real-time:** แทนที่จะใช้ WebSockets เราใช้ **Polling** ใน `ChatRoom.tsx` เพื่อดึงข้อความใหม่ทุก ๆ 3 วินาที[cite: 42].
 * [cite_start]**Authorization:** Proper Authorization ถูกบังคับใช้ในทุก Endpoint ที่ละเอียดอ่อน (`/conversations`, `/messages`) เพื่อให้มั่นใจว่าผู้ใช้เห็นเฉพาะข้อมูลของตนเองเท่านั้น[cite: 28].
-
----
-
-### [cite_start] Bonus Points ที่ได้ implement [cite: 51, 63]
-
-* [cite_start]✅ **Type safety (TypeScript)** [cite: 52]
-* [cite_start]✅ **Clean UI implementation** with Tailwind CSS [cite: 39]
-* ✅ **Improved Authentication Flow** (แทนการ Hardcode User ID)
