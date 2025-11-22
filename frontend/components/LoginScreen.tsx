@@ -1,11 +1,16 @@
-// components/LoginScreen.tsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface LoginScreenProps {
   API_BASE_URL: string;
   onLoginSuccess: (userId: string, userName: string) => void;
+}
+
+interface ParticleStyle {
+  left: string;
+  top: string;
+  animationDelay: string;
+  animationDuration: string;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess }) => {
@@ -15,7 +20,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
+  const [particleStyles, setParticleStyles] = useState<ParticleStyle[]>([]); 
 
+  useEffect(() => {
+    const styles: ParticleStyle[] = [...Array(20)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 5}s`,
+      animationDuration: `${5 + Math.random() * 10}s`
+    }));
+    setParticleStyles(styles);
+  }, []);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -40,8 +57,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
     }
   };
 
-  const handleSwitchMode = () => {
-    setIsRegister(!isRegister);
+  const handleSwitchMode = (mode: 'login' | 'register') => {
+    if (mode === 'login') {
+        setIsRegister(false);
+    } else {
+        setIsRegister(true);
+    }
     setError(null);
     setName('');
     setPassword('');
@@ -49,34 +70,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
 
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Large gradient orbs */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
         
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
+        {particleStyles.map((style, i) => ( 
           <div
             key={i}
             className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${5 + Math.random() * 10}s`
-            }}
+            style={style}
           />
         ))}
       </div>
 
-      {/* Grid overlay */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
 
-      {/* Main Content */}
       <div className="relative z-10 w-full max-w-md px-6 animate-[fadeInUp_0.8s_ease-out]">
-        {/* Logo/Brand Section */}
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur-2xl opacity-60 animate-pulse"></div>
@@ -93,33 +103,37 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
           <p className="text-gray-400 text-sm font-medium">Connect, Chat, Communicate</p>
         </div>
 
-        {/* Login Card */}
         <div className="relative group">
-          {/* Card glow effect */}
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl blur-xl opacity-25 group-hover:opacity-40 transition duration-300 animate-pulse"></div>
           
-          {/* Main card */}
           <div className="relative bg-white/10 backdrop-blur-2xl p-8 rounded-3xl shadow-2xl border border-white/20">
-            {/* Tab switcher */}
-            <div className="flex gap-2 mb-8 bg-white/5 p-1.5 rounded-2xl backdrop-blur-xl">
+            
+            <div className="flex gap-2 mb-8 bg-white/5 p-1.5 rounded-2xl backdrop-blur-xl relative">
+                <div 
+                    className={`absolute top-1.5 bottom-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg transition-all duration-300 ease-in-out z-0 ${
+                        !isRegister ? 'left-1.5 w-[calc(50%-6px)]' : 'left-[calc(50%+3px)] w-[calc(50%-6px)] bg-gradient-to-r from-purple-500 to-pink-600'
+                    }`}
+                ></div>
+
               <button
                 type="button"
-                onClick={() => !isRegister && handleSwitchMode()}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                onClick={() => handleSwitchMode('login')}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-300 relative z-10 ${
                   !isRegister
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg scale-105'
-                    : 'text-gray-300 hover:text-white hover:bg-white/5'
+                    ? 'text-white scale-105'
+                    : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Login
               </button>
+              
               <button
                 type="button"
-                onClick={() => isRegister && handleSwitchMode()}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                onClick={() => handleSwitchMode('register')}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-300 relative z-10 ${
                   isRegister
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg scale-105'
-                    : 'text-gray-300 hover:text-white hover:bg-white/5'
+                    ? 'text-white scale-105'
+                    : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Register
@@ -127,7 +141,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Username field */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-200 ml-1">
                   Username
@@ -152,7 +165,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
                 </div>
               </div>
 
-              {/* Password field */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-200 ml-1">
                   Password
@@ -193,7 +205,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
                 </div>
               </div>
 
-              {/* Error message */}
               {error && (
                 <div className="relative animate-[shake_0.5s_ease-in-out]">
                   <div className="absolute inset-0 bg-red-500 rounded-2xl blur opacity-30"></div>
@@ -206,13 +217,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
                 </div>
               )}
 
-              {/* Submit button */}
               <button
                 type="submit"
                 disabled={loading}
                 className="group relative w-full py-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className={`absolute inset-0 transition-opacity duration-500 ${isRegister ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} opacity-0 group-hover:opacity-100`}></div>
                 <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 blur-xl transition-opacity"></div>
                 <span className="relative flex items-center justify-center gap-2">
                   {loading ? (
@@ -232,16 +242,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
               </button>
             </form>
 
-            {/* Additional info */}
             <div className="mt-6 text-center">
-              <p className="text-gray-400 text-sm">
-                {isRegister ? 'Already have an account?' : "Don't have an account?"}
-              </p>
+              <button 
+                type="button" 
+                onClick={() => handleSwitchMode(isRegister ? 'login' : 'register')}
+                className="text-gray-400 text-sm hover:text-white transition-colors"
+              >
+                {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Features pills */}
         <div className="flex flex-wrap justify-center gap-3 mt-8">
           <div className="px-4 py-2 bg-white/10 backdrop-blur-xl rounded-full border border-white/20 text-white text-sm font-medium flex items-center gap-2">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
@@ -257,78 +269,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL, onLoginSuccess 
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          25% {
-            transform: translate(20px, -50px) scale(1.1);
-          }
-          50% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          75% {
-            transform: translate(50px, 50px) scale(1.05);
-          }
-        }
-
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) translateX(0);
-            opacity: 0.2;
-          }
-          50% {
-            transform: translateY(-100px) translateX(50px);
-            opacity: 0.5;
-          }
-        }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes shimmer {
-          0%, 100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-
-        @keyframes shake {
-          0%, 100% {
-            transform: translateX(0);
-          }
-          25% {
-            transform: translateX(-10px);
-          }
-          75% {
-            transform: translateX(10px);
-          }
-        }
-
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </div>
   );
 };

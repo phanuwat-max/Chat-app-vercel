@@ -1,7 +1,12 @@
-// components/ChatRoom.tsx
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
+
+interface ParticleStyle {
+  left: string;
+  top: string;
+  animationDelay: string;
+  animationDuration: string;
+}
 
 interface User {
   id: string;
@@ -21,20 +26,34 @@ interface ChatRoomProps {
   currentUser: User;
   API_BASE_URL: string;
   onMessageSent: () => void;
+  otherParticipantName: string; 
 }
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ 
   conversationId, 
   currentUser, 
   API_BASE_URL,
-  onMessageSent 
+  onMessageSent,
+  otherParticipantName 
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [otherUserName, setOtherUserName] = useState<string>('');
+  const [particleStyles, setParticleStyles] = useState<ParticleStyle[]>([]); 
+  const [messageError, setMessageError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const styles: ParticleStyle[] = [...Array(15)].map(() => ({ 
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 5}s`,
+      animationDuration: `${5 + Math.random() * 10}s`
+    }));
+    setParticleStyles(styles);
+  }, []);
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -59,30 +78,34 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
     
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
-
-  const fetchMessages = async () => {
+  
+  const fetchMessages = useCallback(async () => {
+    
+    
     try {
-      if (!loading) setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/conversations/${conversationId}/messages`, {
         headers: { 'x-user-id': currentUser.id },
       });
       setMessages(response.data);
       
-      const otherMessage = response.data.find((msg: Message) => msg.senderId !== currentUser.id);
-      if (otherMessage) {
-        setOtherUserName(otherMessage.senderId);
-      }
-      
-      setLoading(false);
     } catch (err) {
       console.error('Error fetching messages:', err);
-      setLoading(false);
+    } finally {
+       // setLoading(false);
     }
-  };
+  }, [API_BASE_URL, conversationId, currentUser.id]); 
+
+  // Effect สำหรับโหลดครั้งแรก (แสดง Loading)
+  useEffect(() => {
+      setLoading(true);
+      fetchMessages().finally(() => setLoading(false));
+  }, [fetchMessages]); // รันเมื่อ conversation เปลี่ยน
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === '' || sending) return;
+
+    setMessageError(null);
 
     try {
       setSending(true);
@@ -93,57 +116,49 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
       );
 
       setNewMessage('');
-      fetchMessages();
+      fetchMessages(); 
       onMessageSent();
-      setSending(false);
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Failed to send message.');
-      setSending(false);
+      setMessageError('Failed to send message. Please try again.'); 
+    } finally {
+        setSending(false);
     }
   };
 
+  // Effect สำหรับ Polling (อัปเดตข้อความ)
   useEffect(() => {
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 3000);
+    const interval = setInterval(fetchMessages, 3000); 
     return () => clearInterval(interval);
-  }, [conversationId, currentUser.id]);
+  }, [fetchMessages]);
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
         
-        {/* Floating particles */}
-        {[...Array(15)].map((_, i) => (
+        {particleStyles.map((style, i) => ( 
           <div
             key={i}
             className="absolute w-1 h-1 bg-white rounded-full opacity-30 animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${5 + Math.random() * 10}s`
-            }}
+            style={style}
           />
         ))}
       </div>
 
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L2N2Zz4=')] opacity-20"></div>
 
       {/* Header */}
       <header className="relative z-10 border-b border-white/10 bg-white/5 backdrop-blur-xl">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {/* Avatar with animated ring */}
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity animate-pulse"></div>
               <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-xl shadow-2xl transform group-hover:scale-110 transition-all duration-300">
-                {otherUserName ? otherUserName.charAt(0).toUpperCase() : '?'}
+                {/* แสดงอักษรตัวแรกของชื่อจาก Prop */}
+                {otherParticipantName ? otherParticipantName.charAt(0).toUpperCase() : '?'}
               </div>
               <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-3 border-slate-900 rounded-full shadow-lg">
                 <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-75"></div>
@@ -152,7 +167,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
             
             <div>
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                {otherUserName || 'Loading...'}
+                {/* แสดงชื่อเต็มจาก Prop */}
+                {otherParticipantName || 'Loading...'}
                 <span className="text-xs font-medium text-purple-300 bg-purple-500/20 px-2.5 py-1 rounded-full border border-purple-400/30">
                   Online
                 </span>
@@ -168,7 +184,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
             </div>
           </div>
 
-          {/* Info button */}
           <button className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95 group border border-white/10">
             <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -197,7 +212,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
                 <div className="relative text-7xl animate-[wave_2s_ease-in-out_infinite]">👋</div>
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Start the conversation</h3>
-              <p className="text-gray-400">Send your first message to {otherUserName || 'get started'}</p>
+              <p className="text-gray-400">Send your first message to {otherParticipantName || 'get started'}</p>
               <div className="mt-6 flex justify-center gap-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -220,7 +235,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
                   {/* Avatar */}
                   {!isCurrentUser && (
                     <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-xl transition-all duration-200 border border-white/20 ${showAvatar ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`}>
-                      {msg.senderId.charAt(0).toUpperCase()}
+                      {/* ใช้อักษรตัวแรกจากชื่อของผู้สนทนา (หากไม่ใช่ user ปัจจุบัน) */}
+                      {otherParticipantName.charAt(0).toUpperCase()}
                     </div>
                   )}
 
@@ -239,10 +255,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
                             : 'bg-white/10 text-white border-white/20'
                         }`}
                       >
-                        {/* Message content */}
                         <p className="text-sm leading-relaxed break-words">{msg.content}</p>
-                        
-                        {/* Decorative shine effect */}
                         <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
                           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/20 to-transparent"></div>
                         </div>
@@ -273,6 +286,22 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
 
       {/* Input Area */}
       <form onSubmit={handleSendMessage} className="relative z-10 p-4 bg-white/5 backdrop-blur-xl border-t border-white/10">
+        {/* Message Error Display */}
+        {messageError && (
+            <div className="relative -mt-3 mb-3 animate-[slideInUp_0.3s_ease-out] mx-auto max-w-5xl">
+                <div className="absolute inset-0 bg-red-500 rounded-xl blur opacity-30"></div>
+                <div className="relative flex items-center gap-2 p-3 bg-red-500/20 border border-red-500/30 rounded-xl backdrop-blur-xl text-red-200 text-sm font-medium">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {messageError}
+                    <button type="button" onClick={() => setMessageError(null)} className="ml-auto text-red-400 hover:text-white transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+            </div>
+        )}
+
         <div className="flex gap-3 items-end max-w-5xl mx-auto">
           {/* Attachment button */}
           <button 
@@ -326,92 +355,18 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
             )}
           </button>
         </div>
-
-        {/* Typing indicator */}
-        {sending && (
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 animate-[fadeIn_0.3s_ease-out]">
-            <div className="flex gap-1 bg-white/10 backdrop-blur-xl px-3 py-1.5 rounded-full shadow-xl border border-white/20">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-              <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-            </div>
-          </div>
-        )}
       </form>
 
-      <style jsx>{`
-        @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          25% {
-            transform: translate(20px, -50px) scale(1.1);
-          }
-          50% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          75% {
-            transform: translate(50px, 50px) scale(1.05);
-          }
-        }
-
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) translateX(0);
-            opacity: 0.3;
-          }
-          50% {
-            transform: translateY(-100px) translateX(50px);
-            opacity: 0.6;
-          }
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes wave {
-          0%, 100% {
-            transform: rotate(0deg);
-          }
-          25% {
-            transform: rotate(20deg);
-          }
-          75% {
-            transform: rotate(-20deg);
-          }
-        }
-
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
+      {/* Typing indicator */}
+      {sending && (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 animate-[fadeIn_0.3s_ease-out]">
+          <div className="flex gap-1 bg-white/10 backdrop-blur-xl px-3 py-1.5 rounded-full shadow-xl border border-white/20">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+            <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
