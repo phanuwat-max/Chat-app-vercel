@@ -18,7 +18,6 @@ interface Message {
 interface ChatRoomProps {
   conversationId: string;
   currentUser: User;
-  API_BASE_URL: string;
   onMessageSent: () => void;
   otherParticipantName: string;
 }
@@ -26,7 +25,6 @@ interface ChatRoomProps {
 const ChatRoom: React.FC<ChatRoomProps> = ({
   conversationId,
   currentUser,
-  API_BASE_URL,
   onMessageSent,
   otherParticipantName
 }) => {
@@ -36,6 +34,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messageError, setMessageError] = useState<string | null>(null);
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:3001' : '/api');
 
   const scrollToBottom = (smooth = true) => {
     messagesEndRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' });
@@ -78,7 +78,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
 
   const fetchMessages = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/conversations/${conversationId}/messages`, {
+      // Remove double slash if API_BASE_URL ends with /
+      const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+
+      const response = await axios.get(`${baseUrl}/conversations/${conversationId}/messages`, {
         headers: { 'x-user-id': currentUser.id },
       });
       setMessages(response.data);
@@ -104,8 +107,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
 
     try {
       setSending(true);
+
+      // Remove double slash if API_BASE_URL ends with /
+      const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+
       await axios.post(
-        `${API_BASE_URL}/conversations/${conversationId}/messages`,
+        `${baseUrl}/conversations/${conversationId}/messages`,
         { content: newMessage },
         { headers: { 'x-user-id': currentUser.id } }
       );
@@ -240,11 +247,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
           </div>
 
           {/* Send button */}
-          <button
-            type="submit"
-            disabled={sending || newMessage.trim() === ''}
-            className={styles.sendBtn}
-          >
+          <button type="submit" className={styles.sendBtn} disabled={newMessage.trim() === '' || sending}>
             {sending ? '...' : 'SEND'}
           </button>
         </div>

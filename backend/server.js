@@ -168,6 +168,11 @@ app.post('/conversations/:id/messages', authorize, (req, res) => {
     res.status(201).json(newMessage);
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Start server only if not running in Vercel (Vercel exports the app)
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
+
+export default app;
