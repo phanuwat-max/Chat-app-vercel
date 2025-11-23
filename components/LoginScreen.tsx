@@ -37,13 +37,22 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       if (response.status === 200 || response.status === 201) {
         const userId = response.data.userId;
         const userName = response.data.userName;
-        onLoginSuccess(userId, userName);
+
+        // Only call onLoginSuccess if we have valid data
+        if (userId && userName) {
+          onLoginSuccess(userId, userName);
+        } else {
+          setError('Invalid response from server. Please try again.');
+          setLoading(false);
+        }
+      } else {
+        setError('Unexpected response from server. Please try again.');
+        setLoading(false);
       }
     } catch (err: any) {
       console.error(`${endpoint} error:`, err);
       const errorMessage = err.response?.data?.error || `Failed to ${endpoint}. Please try again.`;
       setError(errorMessage);
-    } finally {
       setLoading(false);
     }
   };
@@ -77,6 +86,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  disabled={loading}
                 />
               </div>
               <div className={styles.inputGroup}>
@@ -87,6 +97,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
                 />
               </div>
 
@@ -99,6 +110,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
               )}
@@ -108,7 +120,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
               </button>
             </form>
 
-            <button type="button" onClick={handleSwitchMode} className={styles.toggleBtn}>
+            <button
+              type="button"
+              onClick={handleSwitchMode}
+              className={styles.toggleBtn}
+              disabled={loading}
+            >
               {isRegister ? 'Already have an account? Login' : 'New here? Create Account'}
             </button>
           </div>
