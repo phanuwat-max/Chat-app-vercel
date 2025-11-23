@@ -3,18 +3,10 @@ import axios from 'axios';
 import styles from './LoginScreen.module.css';
 
 interface LoginScreenProps {
-  API_BASE_URL: string;
   onLoginSuccess: (userId: string, userName: string) => void;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ API_BASE_URL: initialApiUrl, onLoginSuccess }) => {
-  // Use relative path '/api' in production (Vercel), or localhost in dev
-  // If initialApiUrl is passed (from props), use it. Otherwise default to relative path '/api' for Vercel
-  // But for local dev, we might need http://localhost:3001
-  // Let's use a smarter default: if we are on the same domain (production), use /api.
-  // For now, let's stick to the prop passed from parent, but parent needs to be smart.
-  // Actually, let's override it here for simplicity in this context.
-
+const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:3001' : '/api');
 
   const [name, setName] = useState('');

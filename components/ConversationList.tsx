@@ -26,7 +26,6 @@ interface ConversationListProps {
   selectedConversationId: string | null;
   setSelectedConversationId: (id: string) => void;
   fetchConversations: () => void;
-  API_BASE_URL: string;
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({
@@ -34,9 +33,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
   conversations,
   selectedConversationId,
   setSelectedConversationId,
-  fetchConversations,
-  API_BASE_URL
+  fetchConversations
 }) => {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:3001' : '/api');
+
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [showInbox, setShowInbox] = useState(false);
 
@@ -51,7 +51,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
   const fetchRequests = useCallback(async () => {
     if (!currentUser) return;
     try {
-      const res = await axios.get(`${API_BASE_URL}/friends/requests`, {
+      // Remove double slash if API_BASE_URL ends with /
+      const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+      const res = await axios.get(`${baseUrl}/friends/requests`, {
         headers: { 'x-user-id': currentUser.id }
       });
       setFriendRequests(res.data);
@@ -77,7 +79,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
     setAddSuccess(null);
 
     try {
-      await axios.post(`${API_BASE_URL}/friends/request`,
+      // Remove double slash if API_BASE_URL ends with /
+      const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+
+      await axios.post(`${baseUrl}/friends/request`,
         { targetUsername: friendUsername },
         { headers: { 'x-user-id': currentUser?.id } }
       );
@@ -96,7 +101,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
   const handleAccept = async (requestId: string) => {
     try {
-      await axios.post(`${API_BASE_URL}/friends/requests/${requestId}/accept`, {}, {
+      // Remove double slash if API_BASE_URL ends with /
+      const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+
+      await axios.post(`${baseUrl}/friends/requests/${requestId}/accept`, {}, {
         headers: { 'x-user-id': currentUser?.id }
       });
       fetchRequests();
@@ -108,7 +116,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
   const handleReject = async (requestId: string) => {
     try {
-      await axios.post(`${API_BASE_URL}/friends/requests/${requestId}/reject`, {}, {
+      // Remove double slash if API_BASE_URL ends with /
+      const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+
+      await axios.post(`${baseUrl}/friends/requests/${requestId}/reject`, {}, {
         headers: { 'x-user-id': currentUser?.id }
       });
       fetchRequests();

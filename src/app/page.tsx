@@ -125,7 +125,7 @@ export default function Home() {
   }
 
   if (!authUserId) {
-    return <LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={handleLoginSuccess} />;
+    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
   }
 
   if (loading || !currentUser) {
@@ -184,7 +184,6 @@ export default function Home() {
             selectedConversationId={selectedConversationId}
             setSelectedConversationId={setSelectedConversationId}
             fetchConversations={fetchConversations}
-            API_BASE_URL={API_BASE_URL}
           />
         </div>
       </div>
@@ -195,7 +194,6 @@ export default function Home() {
           <ChatRoom
             conversationId={selectedConversationId}
             currentUser={currentUser}
-            API_BASE_URL={API_BASE_URL}
             onMessageSent={fetchConversations}
             otherParticipantName={selectedConversation?.otherParticipant.name || ''}
           />
