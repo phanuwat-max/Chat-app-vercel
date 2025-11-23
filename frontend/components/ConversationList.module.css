@@ -1,0 +1,512 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    font-family: 'Courier New', Courier, monospace;
+    /* Monospace fits brutalist well */
+}
+
+/* Custom Scrollbar */
+.listContainer::-webkit-scrollbar,
+.inboxList::-webkit-scrollbar {
+    width: 12px;
+}
+
+.listContainer::-webkit-scrollbar-track,
+.inboxList::-webkit-scrollbar-track {
+    background: #fff;
+    border-left: 3px solid #000;
+}
+
+.listContainer::-webkit-scrollbar-thumb,
+.inboxList::-webkit-scrollbar-thumb {
+    background: #000;
+    border: 3px solid #fff;
+    box-shadow: inset -1px -1px 0 #000;
+}
+
+.listContainer::-webkit-scrollbar-thumb:hover,
+.inboxList::-webkit-scrollbar-thumb:hover {
+    background: #ff3366;
+}
+
+.toolbar {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-bottom: 4px solid #000;
+    background: #fff;
+}
+
+.searchContainer {
+    position: relative;
+    width: 100%;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border: 3px solid #000;
+    background: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    color: #000;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 #000;
+    transform: translate(-2px, -2px);
+}
+
+.actionButtons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: 3px solid #000;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btnAdd {
+    flex: 1;
+    background: #ff3366;
+    color: #fff;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.btnAdd:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000;
+    background: #ff1a53;
+}
+
+.btnAdd:active {
+    transform: translate(0, 0);
+    box-shadow: 2px 2px 0 #000;
+}
+
+.btnInbox {
+    background: #fff;
+    color: #000;
+    box-shadow: 4px 4px 0 #000;
+    position: relative;
+}
+
+.btnInbox:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000;
+    background: #f0f0f0;
+}
+
+.btnInboxActive {
+    background: #000;
+    color: #fff;
+    box-shadow: inset 4px 4px 0 rgba(255, 255, 255, 0.2);
+}
+
+.badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #ff3366;
+    color: #fff;
+    border: 2px solid #000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 2px 2px 0 #000;
+}
+
+/* Inbox Panel */
+.inboxPanel {
+    margin: 0 20px 20px;
+    border: 3px solid #000;
+    background: #fff;
+    box-shadow: 8px 8px 0 #000;
+    animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inboxHeader {
+    padding: 10px 15px;
+    border-bottom: 3px solid #000;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.inboxCloseBtn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.inboxCloseBtn:hover {
+    color: #ff3366;
+}
+
+.inboxList {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.emptyInbox {
+    padding: 20px;
+    text-align: center;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.requestItem {
+    padding: 10px 15px;
+    border-bottom: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.requestItem:last-child {
+    border-bottom: none;
+}
+
+.requestUserInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.requestAvatar {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+    border: 2px solid #000;
+    background: #ff6b35;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.requestName {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.requestActions {
+    display: flex;
+    gap: 5px;
+}
+
+.btnAction {
+    padding: 5px;
+    border: 2px solid #000;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.btnAccept {
+    background: #4ade80;
+    color: #000;
+}
+
+.btnReject {
+    background: #f87171;
+    color: #000;
+}
+
+.btnAction:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+/* Modal */
+.modalOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    backdrop-filter: blur(2px);
+}
+
+.modalCard {
+    width: 90%;
+    max-width: 350px;
+    background: #fff;
+    border: 4px solid #000;
+    box-shadow: 12px 12px 0 #000;
+    padding: 25px;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modalTitle {
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    border-bottom: 4px solid #ff3366;
+    display: inline-block;
+}
+
+.modalInput {
+    width: 100%;
+    padding: 12px;
+    border: 3px solid #000;
+    margin-bottom: 15px;
+    font-weight: bold;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.modalInput:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.inputWrapper {
+    margin-bottom: 15px;
+}
+
+.successMessage {
+    background: #4ade80;
+    padding: 10px;
+    border: 3px solid #000;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: 4px 4px 0 #000;
+    color: #000;
+}
+
+.errorMessage {
+    color: #fff;
+    background: #ef4444;
+    padding: 8px;
+    border: 2px solid #000;
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 12px;
+    box-shadow: 3px 3px 0 #000;
+}
+
+.modalActions {
+    display: flex;
+    gap: 10px;
+}
+
+.btnCancel {
+    background: #fff;
+    color: #000;
+    flex: 1;
+}
+
+.btnCancel:hover {
+    background: #f0f0f0;
+    box-shadow: 6px 6px 0 #000;
+    transform: translate(-2px, -2px);
+}
+
+.btnSend {
+    background: #000;
+    color: #fff;
+    flex: 1;
+}
+
+.btnSend:hover {
+    background: #333;
+    box-shadow: 6px 6px 0 #000;
+    transform: translate(-2px, -2px);
+}
+
+/* Conversation List */
+.listContainer {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.emptyList {
+    text-align: center;
+    margin-top: 40px;
+    opacity: 0.6;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.emptyListSub {
+    font-size: 12px;
+    background: #000;
+    color: #fff;
+    padding: 5px 10px;
+    transform: rotate(-2deg);
+}
+
+.convItem {
+    width: 100%;
+    padding: 15px;
+    background: #fff;
+    border: 3px solid #000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.convItem:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 10px 10px 0 #000;
+    z-index: 1;
+}
+
+.convItemActive {
+    background: #000;
+    color: #fff;
+    box-shadow: 8px 8px 0 #ff3366;
+    transform: translate(-2px, -2px);
+}
+
+.convItemActive:hover {
+    box-shadow: 10px 10px 0 #ff3366;
+}
+
+.avatarContainer {
+    position: relative;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #000;
+    background: #ff6b35;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 20px;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.convItemActive .avatar {
+    border-color: #fff;
+    box-shadow: 2px 2px 0 #ff3366;
+}
+
+.convInfo {
+    flex: 1;
+    overflow: hidden;
+}
+
+.convHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.convName {
+    font-weight: 800;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.convTime {
+    font-size: 10px;
+    font-weight: bold;
+    background: #e0e0e0;
+    padding: 2px 6px;
+    border: 1px solid #000;
+}
+
+.convItemActive .convTime {
+    background: #333;
+    color: #fff;
+    border-color: #fff;
+}
+
+.convMessage {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.8;
+}
+
+.noMessage {
+    opacity: 0.5;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.activeIndicator {
+    width: 10px;
+    height: 10px;
+    background: #4ade80;
+    border: 2px solid #000;
+    position: absolute;
+    bottom: 12px;
+    left: 55px;
+}

@@ -1,0 +1,307 @@
+.container {
+    display: flex;
+    height: 100vh;
+    background-color: #f0f0f0;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Custom Scrollbar for Global */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff;
+    border-left: 3px solid #000;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #000;
+    border: 3px solid #fff;
+    box-shadow: inset -1px -1px 0 #000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ff3366;
+}
+
+/* Background Pattern */
+.container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#000 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.sidebar {
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-right: 4px solid #000;
+    z-index: 20;
+    position: relative;
+    box-shadow: 4px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.sidebarHeader {
+    padding: 20px;
+    background: #2d2d2d;
+    /* Dark header for contrast */
+    border-bottom: 4px solid #000;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.userAvatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #ff3366, #ff6b35);
+    border: 3px solid #fff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 20px;
+    box-shadow: 3px 3px 0 #000;
+}
+
+.userName {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName h1 {
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.userStatus {
+    font-size: 10px;
+    color: #4ade80;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-transform: uppercase;
+}
+
+.statusDot {
+    width: 8px;
+    height: 8px;
+    background: #4ade80;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #000;
+}
+
+.logoutBtn {
+    width: 40px;
+    height: 40px;
+    background: #ff3366;
+    border: 3px solid #fff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
+    background: #ff1a53;
+}
+
+.sidebarContent {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.mainContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+    background: #fff;
+}
+
+.emptyState {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+    position: relative;
+}
+
+.emptyState::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#000 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.emptyContent {
+    background: #fff;
+    padding: 40px;
+    border: 4px solid #000;
+    box-shadow: 8px 8px 0 #000;
+    text-align: center;
+    max-width: 400px;
+    z-index: 1;
+}
+
+.emptyIcon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.emptyTitle {
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.emptyText {
+    font-size: 14px;
+    color: #666;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+/* Loading Screen */
+.loadingScreen {
+    position: fixed;
+    inset: 0;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.loadingCard {
+    background: #fff;
+    padding: 40px;
+    border: 4px solid #000;
+    box-shadow: 8px 8px 0 #000;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #000;
+    border-top-color: #ff3366;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loadingText {
+    font-weight: 900;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+/* Error Screen */
+.errorScreen {
+    position: fixed;
+    inset: 0;
+    background: #ff3366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 20px;
+}
+
+.errorCard {
+    background: #fff;
+    padding: 40px;
+    border: 4px solid #000;
+    box-shadow: 10px 10px 0 #000;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+}
+
+.errorTitle {
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: #000;
+}
+
+.errorMessage {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+    border: 2px solid #000;
+    padding: 15px;
+    background: #f0f0f0;
+}
+
+.retryBtn {
+    width: 100%;
+    padding: 15px;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid #000;
+}
+
+.retryBtn:hover {
+    background: #fff;
+    color: #000;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #000;
+}
