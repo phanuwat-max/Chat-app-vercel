@@ -6,16 +6,21 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Determine database file based on environment
-const dbFile = process.env.NODE_ENV === 'test' ? ':memory:' : join(__dirname, 'chat.db');
+// Determine database path
+// In Vercel (production), we must use /tmp for writable access
+// In development, we use the local file
+const dbPath = process.env.VERCEL || process.env.NODE_ENV === 'production'
+  ? '/tmp/chat.db'
+  : join(__dirname, 'chat.db');
 
-// สร้าง/เชื่อมต่อ database
-const db = new Database(dbFile);
+// Create/Connect database
+const db = new Database(dbPath, { verbose: console.log });
+console.log(`Connected to SQLite database at ${dbPath}`);
 
 // Enable foreign keys
 db.pragma('foreign_keys = ON');
 
-// สร้าง tables
+// Initialize tables
 const initDatabase = () => {
   // Users table
   db.exec(`
@@ -88,32 +93,36 @@ const initDatabase = () => {
 
 // Seed initial data if database is empty
 const seedDatabase = () => {
-  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
+  try {
+    const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
 
-  if (userCount.count === 0) {
-    console.log('📦 Seeding initial data...');
+    if (userCount.count === 0) {
+      console.log('📦 Seeding initial data...');
 
-    // Insert seed users
-    const insertUser = db.prepare('INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)');
-    insertUser.run('user1', 'Alice', 'alice@example.com', 'password1');
-    insertUser.run('user2', 'Bob', 'bob@example.com', 'password2');
-    insertUser.run('user3', 'Charlie', 'charlie@example.com', 'password3');
+      // Insert seed users
+      const insertUser = db.prepare('INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)');
+      insertUser.run('user1', 'Alice', 'alice@example.com', 'password1');
+      insertUser.run('user2', 'Bob', 'bob@example.com', 'password2');
+      insertUser.run('user3', 'Charlie', 'charlie@example.com', 'password3');
 
-    // Create a conversation between Alice and Bob
-    const insertConv = db.prepare('INSERT INTO conversations (id, last_message_content, last_message_timestamp) VALUES (?, ?, ?)');
-    const timestamp = Date.now() - 60000;
-    insertConv.run('conv1', 'Hey Bob!', timestamp);
+      // Create a conversation between Alice and Bob
+      const insertConv = db.prepare('INSERT INTO conversations (id, last_message_content, last_message_timestamp) VALUES (?, ?, ?)');
+      const timestamp = Date.now() - 60000;
+      insertConv.run('conv1', 'Hey Bob!', timestamp);
 
-    // Add participants
-    const insertParticipant = db.prepare('INSERT INTO conversation_participants (conversation_id, user_id) VALUES (?, ?)');
-    insertParticipant.run('conv1', 'user1');
-    insertParticipant.run('conv1', 'user2');
+      // Add participants
+      const insertParticipant = db.prepare('INSERT INTO conversation_participants (conversation_id, user_id) VALUES (?, ?)');
+      insertParticipant.run('conv1', 'user1');
+      insertParticipant.run('conv1', 'user2');
 
-    // Add initial message
-    const insertMessage = db.prepare('INSERT INTO messages (id, conversation_id, sender_id, content, timestamp) VALUES (?, ?, ?, ?, ?)');
-    insertMessage.run('msg1', 'conv1', 'user1', 'Hey Bob!', timestamp);
+      // Add initial message
+      const insertMessage = db.prepare('INSERT INTO messages (id, conversation_id, sender_id, content, timestamp) VALUES (?, ?, ?, ?, ?)');
+      insertMessage.run('msg1', 'conv1', 'user1', 'Hey Bob!', timestamp);
 
-    console.log('✅ Seed data inserted');
+      console.log('✅ Seed data inserted');
+    }
+  } catch (err) {
+    console.error('Seed error (ignoring):', err);
   }
 };
 
