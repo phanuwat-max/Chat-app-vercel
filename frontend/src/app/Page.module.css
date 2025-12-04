@@ -1,6 +1,15 @@
 .container {
     display: flex;
     height: 100vh;
+    background-color: #f0f0f0;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Background Pattern */
+.container::before {
+    content: "";
     position: absolute;
     inset: 0;
     background-image: radial-gradient(#000 1px, transparent 1px);
@@ -8,6 +17,26 @@
     opacity: 0.1;
     pointer-events: none;
     z-index: 0;
+}
+
+/* Custom Scrollbar for Global */
+:global(::-webkit-scrollbar) {
+    width: 12px;
+}
+
+:global(::-webkit-scrollbar-track) {
+    background: #fff;
+    border-left: 3px solid #000;
+}
+
+:global(::-webkit-scrollbar-thumb) {
+    background: #000;
+    border: 3px solid #fff;
+    box-shadow: inset -1px -1px 0 #000;
+}
+
+:global(::-webkit-scrollbar-thumb:hover) {
+    background: #ff3366;
 }
 
 .sidebar {
@@ -24,7 +53,6 @@
 .sidebarHeader {
     padding: 20px;
     background: #2d2d2d;
-    /* Dark header for contrast */
     border-bottom: 4px solid #000;
     color: #fff;
     display: flex;

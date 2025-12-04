@@ -1,4 +1,3 @@
-
 .pageContainer {
   display: flex;
   align-items: center;
@@ -12,7 +11,7 @@
 .loginContainer {
   position: relative;
   perspective: 1000px;
-  width: 350px;
+  width: 450px;
   /* Increased width */
   margin: 0 auto;
 }
@@ -215,8 +214,8 @@
 
 .loginCard:hover~.loginContainer::before,
 .loginContainer:hover::before {
-  width: 400px;
-  height: 400px;
+  width: 550px;
+  height: 550px;
 }
 
 .errorMsg {

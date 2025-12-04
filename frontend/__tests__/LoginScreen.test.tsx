@@ -1,7 +1,7 @@
 // frontend/__tests__/LoginScreen.test.tsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import LoginScreen from '../components/LoginScreen';
+import LoginScreen from '@/components/LoginScreen';
 import axios from 'axios';
 
 // Mock axios
@@ -17,7 +17,7 @@ describe('LoginScreen Component', () => {
     });
 
     test('renders login form by default', () => {
-        render(<LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={mockOnLoginSuccess} />);
+        render(<LoginScreen onLoginSuccess={mockOnLoginSuccess} />);
 
         expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe('LoginScreen Component', () => {
     });
 
     test('switches to register mode when clicking toggle button', () => {
-        render(<LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={mockOnLoginSuccess} />);
+        render(<LoginScreen onLoginSuccess={mockOnLoginSuccess} />);
 
         const toggleButton = screen.getByText(/New here\? Create Account/i);
         fireEvent.click(toggleButton);
@@ -35,7 +35,7 @@ describe('LoginScreen Component', () => {
     });
 
     test('shows error when passwords do not match in register mode', async () => {
-        render(<LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={mockOnLoginSuccess} />);
+        render(<LoginScreen onLoginSuccess={mockOnLoginSuccess} />);
 
         // Switch to register mode
         const toggleButton = screen.getByText(/New here\? Create Account/i);
@@ -63,7 +63,7 @@ describe('LoginScreen Component', () => {
             data: { userId: 'user1', userName: 'TestUser' }
         });
 
-        render(<LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={mockOnLoginSuccess} />);
+        render(<LoginScreen onLoginSuccess={mockOnLoginSuccess} />);
 
         const usernameInput = screen.getByPlaceholderText('Username');
         const passwordInput = screen.getByPlaceholderText('Password');
@@ -87,7 +87,7 @@ describe('LoginScreen Component', () => {
             response: { data: { error: 'Invalid password.' } }
         });
 
-        render(<LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={mockOnLoginSuccess} />);
+        render(<LoginScreen onLoginSuccess={mockOnLoginSuccess} />);
 
         const usernameInput = screen.getByPlaceholderText('Username');
         const passwordInput = screen.getByPlaceholderText('Password');
@@ -108,7 +108,7 @@ describe('LoginScreen Component', () => {
             data: { userId: 'user2', userName: 'NewUser' }
         });
 
-        render(<LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={mockOnLoginSuccess} />);
+        render(<LoginScreen onLoginSuccess={mockOnLoginSuccess} />);
 
         // Switch to register mode
         const toggleButton = screen.getByText(/New here\? Create Account/i);
@@ -136,7 +136,7 @@ describe('LoginScreen Component', () => {
     test('disables submit button while loading', async () => {
         mockedAxios.post.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
-        render(<LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={mockOnLoginSuccess} />);
+        render(<LoginScreen onLoginSuccess={mockOnLoginSuccess} />);
 
         const usernameInput = screen.getByPlaceholderText('Username');
         const passwordInput = screen.getByPlaceholderText('Password');
@@ -151,7 +151,7 @@ describe('LoginScreen Component', () => {
     });
 
     test('clears form when switching between login and register modes', () => {
-        render(<LoginScreen API_BASE_URL={API_BASE_URL} onLoginSuccess={mockOnLoginSuccess} />);
+        render(<LoginScreen onLoginSuccess={mockOnLoginSuccess} />);
 
         const usernameInput = screen.getByPlaceholderText('Username') as HTMLInputElement;
         const passwordInput = screen.getByPlaceholderText('Password') as HTMLInputElement;

@@ -106,7 +106,7 @@ export default function Home() {
     }
   }, [authUserId, currentUser, isInitialized, handleLogout]);
 
-  // Effect 3: Load Conversations
+  // Effect 3: Load Conversations (Initial)
   useEffect(() => {
     if (currentUser) {
       fetchConversations();
